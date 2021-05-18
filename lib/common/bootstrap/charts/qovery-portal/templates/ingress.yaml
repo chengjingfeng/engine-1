@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: portal-ingress
+  namespace: enzo
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: {{ .Values.hostName | quote }}
+    external-dns.alpha.kubernetes.io/ttl: "300"
+    external-dns.alpha.kubernetes.io/target: {{ .Values.externalDnsTarget}}
+    kubernetes.io/tls-acme: "true"
+    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuer}}
+    kubernetes.io/ingress.class: {{ .Values.ingressClass | quote }}
+    ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,x-csrftoken"
+spec:
+  tls:
+    - hosts:
+        - {{ .Values.hostName | quote }}
+  # We dont use secret name as we want to rely on default tls certificate from ingress controller
+  # which has our wildcard certificate https://cert-manager.io/next-docs/faq/kubed/
+  rules:
+    - host: {{ .Values.hostName | quote }}
+      http:
+        paths:
+          - path: /login
+            backend:
+              serviceName: portal
+              servicePort: 4180
+          - path: /services
+            backend:
+              serviceName: portal
+              servicePort: 80
+          - path: /oauth2
+            backend:
+              serviceName: portal
+              servicePort: 4180
