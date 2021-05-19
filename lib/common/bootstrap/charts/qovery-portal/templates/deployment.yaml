@@ -4,12 +4,12 @@ kind: Deployment
 metadata:
   name: {{ include "kubernetes.fullname" . }}
   labels:
-  {{- include "kubernetes.labels" . | nindent 4 }}
+    app: {{ include "kubernetes.fullname" . }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-  {{- include "kubernetes.selectorLabels" . | nindent 6 }}
+      app: {{ include "kubernetes.fullname" . }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -17,7 +17,7 @@ spec:
       {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-    {{- include "kubernetes.selectorLabels" . | nindent 8 }}
+        app: {{ include "kubernetes.fullname" . }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -47,19 +47,19 @@ spec:
       volumes:
         - name: "oauth-storage"
           configMap:
-            name: {{ include "kubernetes.fullname" . }}-conf
+            name: {{ include "kubernetes.fullname" . }}
             items:
               - key: config
                 path: config
         - name: "nginx-storage"
           configMap:
-            name: {{ include "kubernetes.fullname" . }}-conf
+            name: {{ include "kubernetes.fullname" . }}
             items:
               - key: default.conf
                 path: default.conf
         - name: nginx-html
           configMap:
-            name: {{ include "kubernetes.fullname" . }}-conf
+            name: {{ include "kubernetes.fullname" . }}
             items:
               - key: index.html
                 path: index.html

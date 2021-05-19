@@ -25,13 +25,13 @@ spec:
         paths:
           - path: /login
             backend:
-              serviceName: {{ include "kubernetes.fullname" . }}-service
+              serviceName: {{ include "kubernetes.fullname" . }}
               servicePort: {{ .Values.oauthConfig.port }}
           - path: /services
             backend:
-              serviceName: {{ include "kubernetes.fullname" . }}-service
+              serviceName: {{ include "kubernetes.fullname" . }}
               servicePort: {{ .Values.portal.port }}
           - path: /oauth2
             backend:
-              serviceName: {{ include "kubernetes.fullname" . }}-service
+              serviceName: {{ include "kubernetes.fullname" . }}
               servicePort: {{ .Values.oauthConfig.port }}
