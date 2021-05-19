@@ -1,16 +1,17 @@
+{{- $kubefullname := include "kubernetes.fullname" . }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: portal
+  name: {{ include "kubernetes.fullname" . }}-service
 spec:
   selector:
     app: oauth-support
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 80
+      port: {{ .Values.portal.port }}
+      targetPort: {{ .Values.portal.port }}
       name: nginx-port
     - protocol: TCP
-      port: 4180
-      targetPort: 4180
+      port: {{ .Values.oauthConfig.port }}
+      targetPort: {{ .Values.oauthConfig.port }}
       name: oauth-port

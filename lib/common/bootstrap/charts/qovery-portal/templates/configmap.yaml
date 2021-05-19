@@ -1,10 +1,11 @@
+{{- $kubefullname := include "kubernetes.fullname" . }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: conf
+  name: {{ include "kubernetes.fullname" . }}-conf
 data:
   config: |-
-    http_address = "0.0.0.0:4180"
+    http_address = "0.0.0.0:{{ .Values.oauthConfig.port }}"
     redirect_url = {{ .Values.oauthConfig.redirectUrl | quote }}
     provider= "oidc"
     oidc_issuer_url= {{ .Values.oauthConfig.oidcIssuerUrl | quote }}
@@ -15,7 +16,7 @@ data:
     email_domains = {{ .Values.oauthConfig.emailDomains | quote }}
   default.conf: |-
     server {
-      listen 80;
+      listen {{ .Values.portal.port }};
       server_name {{ .Values.hostName }};
       root /usr/share/nginx/html;
       index index.html;
@@ -37,7 +38,7 @@ data:
     <html lang="en">
     <head>
       <meta charset="utf-8">
-      <title> {{ .Values.webList.title }} </title>
+      <title> {{ .Values.portal.title }} </title>
     </head>
 
     <body>

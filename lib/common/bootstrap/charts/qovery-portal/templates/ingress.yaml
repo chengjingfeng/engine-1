@@ -1,14 +1,14 @@
+{{- $kubefullname := include "kubernetes.fullname" . }}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
-  name: portal-ingress
-  namespace: enzo
+  name: {{ include "kubernetes.fullname" . }}
   annotations:
     external-dns.alpha.kubernetes.io/hostname: {{ .Values.hostName | quote }}
     external-dns.alpha.kubernetes.io/ttl: "300"
-    external-dns.alpha.kubernetes.io/target: {{ .Values.externalDnsTarget}}
+    external-dns.alpha.kubernetes.io/target: {{ .Values.externalDnsTarget }}
     kubernetes.io/tls-acme: "true"
-    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuer}}
+    cert-manager.io/cluster-issuer: {{ .Values.clusterIssuer }}
     kubernetes.io/ingress.class: {{ .Values.ingressClass | quote }}
     ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
@@ -25,13 +25,13 @@ spec:
         paths:
           - path: /login
             backend:
-              serviceName: portal
-              servicePort: 4180
+              serviceName: {{ include "kubernetes.fullname" . }}-service
+              servicePort: {{ .Values.oauthConfig.port }}
           - path: /services
             backend:
-              serviceName: portal
-              servicePort: 80
+              serviceName: {{ include "kubernetes.fullname" . }}-service
+              servicePort: {{ .Values.portal.port }}
           - path: /oauth2
             backend:
-              serviceName: portal
-              servicePort: 4180
+              serviceName: {{ include "kubernetes.fullname" . }}-service
+              servicePort: {{ .Values.oauthConfig.port }}

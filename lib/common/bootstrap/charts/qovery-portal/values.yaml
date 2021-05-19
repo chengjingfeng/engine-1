@@ -4,6 +4,11 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
+hostName: ""
+externalDnsTarget: ""
+clusterIssuer: ""
+ingressClass: ""
+
 oauthConfig:
   redirectUrl: ""
   oidcIssuerUrl: ""
@@ -12,16 +17,16 @@ oauthConfig:
   cookieName: ""
   cookieSecret: ""
   emailDomains: "*"
-
-hostName: ""
+  port: ""
 
 links: []
 #  - name: ""
 #    path: ""
 #    url: ""
 
-webList:
+portal:
   title: ""
+  port: ""
 
 serviceAccount:
   # Specifies whether a service account should be created
