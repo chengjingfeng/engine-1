@@ -18,11 +18,13 @@ oauthConfig:
   cookieSecret: ""
   emailDomains: "*"
   port: ""
+  upstreams: []
 
 links: []
 #  - name: ""
 #    path: ""
-#    url: ""
+#    servicName: ""
+#    port: ""
 
 portal:
   title: ""

@@ -35,3 +35,9 @@ spec:
             backend:
               serviceName: {{ include "kubernetes.fullname" . }}
               servicePort: {{ .Values.oauthConfig.port }}
+          {{- range .Values.links }}
+          - path: /services/{{ .path }}
+            backend:
+              serviceName: {{ .serviceName }}
+              servicePort: {{ .port }}
+          {{- end }}
