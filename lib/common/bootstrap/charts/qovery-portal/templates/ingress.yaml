@@ -1,18 +1,26 @@
 {{- $kubefullname := include "kubernetes.fullname" . }}
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: {{ include "kubernetes.fullname" . }}
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: {{ .Values.hostName | quote }}
-    external-dns.alpha.kubernetes.io/ttl: "300"
-    external-dns.alpha.kubernetes.io/target: {{ .Values.externalDnsTarget }}
     kubernetes.io/tls-acme: "true"
     cert-manager.io/cluster-issuer: {{ .Values.clusterIssuer }}
     kubernetes.io/ingress.class: {{ .Values.ingressClass | quote }}
     ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/enable-cors: "true"
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Authorization,x-csrftoken"
+    nginx.ingress.kubernetes.io/auth-response-headers: Authorization
+    nginx.ingress.kubernetes.io/auth-url: http://qovery-portal.prometheus.svc.cluster.local:4180/oauth2/auth
+    nginx.ingress.kubernetes.io/auth-signin: http://{{- .Values.hostName -}}/oauth2/start?rd=$escaped_request_uri
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      auth_request_set $name_upstream_1 $upstream_cookie_{{- .Values.oauthConfig.cookieName -}};
+
+      access_by_lua_block {
+        if ngx.var.name_upstream_1 ~= "" then
+          ngx.header["Set-Cookie"] = "{{- .Values.oauthConfig.cookieName -}}=" ..  ngx.var.name_upstream_1 .. ngx.var.auth_cookie:match("(; .*)")
+        end
+      }
 spec:
   tls:
     - hosts:
@@ -23,21 +31,7 @@ spec:
     - host: {{ .Values.hostName | quote }}
       http:
         paths:
-          - path: /login
-            backend:
-              serviceName: {{ include "kubernetes.fullname" . }}
-              servicePort: {{ .Values.oauthConfig.port }}
-          - path: /services
+          - path: /
             backend:
               serviceName: {{ include "kubernetes.fullname" . }}
               servicePort: {{ .Values.portal.port }}
-          - path: /oauth2
-            backend:
-              serviceName: {{ include "kubernetes.fullname" . }}
-              servicePort: {{ .Values.oauthConfig.port }}
-          {{- range .Values.links }}
-          - path: /services/{{ .path }}
-            backend:
-              serviceName: {{ .serviceName }}
-              servicePort: {{ .port }}
-          {{- end }}

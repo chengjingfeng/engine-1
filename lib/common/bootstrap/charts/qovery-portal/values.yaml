@@ -23,7 +23,7 @@ oauthConfig:
 links: []
 #  - name: ""
 #    path: ""
-#    servicName: ""
+#    url: ""
 #    port: ""
 
 portal:

@@ -14,11 +14,7 @@ data:
     cookie_name= {{ .Values.oauthConfig.cookieName | quote }}
     cookie_secret = {{ .Values.oauthConfig.cookieSecret | quote }}
     email_domains = {{ .Values.oauthConfig.emailDomains | quote }}
-    upstreams = [
-      {{- range .Values.oauthConfig.upstreams }}
-      {{ . | quote }}
-      {{- end }}
-    ]
+
   default.conf: |-
     server {
       listen {{ .Values.portal.port }};
@@ -26,9 +22,14 @@ data:
       root /usr/share/nginx/html;
       index index.html;
 
-      location / {
-        try_files $uri /index.html;
+      {{- range .Values.links }}
+      location /{{- .path }}/ {
+          proxy_pass  http://{{- .url -}}:{{- .port -}}/;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header Host $host;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
       }
+      {{- end }}
     }
 
   index.html: |-
@@ -44,7 +45,7 @@ data:
       <div>
         <ul>
           {{- range .Values.links }}
-          <li><a href="http://{{- $.Values.hostName -}}/services/{{- .path -}}"> {{ .name }} </a></li>
+          <li><a href="http://{{- $.Values.hostName -}}/{{- .path -}}"> {{ .name }} </a></li>
           {{- end }}
         </ul>
       </div>
