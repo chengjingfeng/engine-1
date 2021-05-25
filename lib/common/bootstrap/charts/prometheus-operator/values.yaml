@@ -389,6 +389,7 @@ alertmanager:
 
     ## 	The external URL the Alertmanager instances will be available under. This is necessary to generate correct URLs. This is necessary if Alertmanager is not served from root of a DNS name.	string	false
     ##
+    ## to use prometheus behind a proxy set with: http://<proxy domain>/<prometheus proxy path>
     externalUrl:
 
     ## 	The route prefix Alertmanager registers HTTP handlers for. This is useful, if using ExternalURL and a proxy is rewriting HTTP routes of a request, and the actual ExternalURL is still true,
