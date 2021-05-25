@@ -407,10 +407,10 @@ grafana.ini:
     url: https://grafana.net
 
 ## To enable grafana behind a proxy :
-#  server:
-#    domain = <proxy domain>
-#    root_url = %(protocol)s://%(domain)s:%(http_port)s/<grafana proxy path>/                                                                                                                                                     │
-#    serve_from_sub_path = true
+  server:
+    domain = qovery-{{ kubernetes_cluster_id }}.{{ managed_dns_domains_helm_format }}
+    root_url = %(protocol)s://%(domain)s:%(http_port)s/grafana/                                                                                                                                                     │
+    serve_from_sub_path = true
 
 ## grafana Authentication can be enabled with the following values on grafana.ini
  # server:

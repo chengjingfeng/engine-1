@@ -390,7 +390,7 @@ alertmanager:
     ## 	The external URL the Alertmanager instances will be available under. This is necessary to generate correct URLs. This is necessary if Alertmanager is not served from root of a DNS name.	string	false
     ##
     ## to use prometheus behind a proxy set with: http://<proxy domain>/<prometheus proxy path>
-    externalUrl:
+    externalUrl: http://qovery-{{ kubernetes_cluster_id }}.{{ managed_dns_domains_helm_format }}/prometheus
 
     ## 	The route prefix Alertmanager registers HTTP handlers for. This is useful, if using ExternalURL and a proxy is rewriting HTTP routes of a request, and the actual ExternalURL is still true,
     ## but the server serves requests under a different route prefix. For example for use with kubectl proxy.
