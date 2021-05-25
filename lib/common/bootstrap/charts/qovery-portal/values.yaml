@@ -4,31 +4,36 @@ imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
 
-hostName: ""
+hostName: "qovery-{{ kubernetes_cluster_id }}.{{ managed_dns_domains_helm_format }}"
 externalDnsTarget: ""
-clusterIssuer: ""
-ingressClass: ""
+clusterIssuer: "letsencrypt-qovery"
+ingressClass: "nginx-qovery"
 
 oauthConfig:
-  redirectUrl: ""
+  redirectUrl: "https://qovery-{{ kubernetes_cluster_id }}.{{ managed_dns_domains_helm_format }}/oauth2/callback"
   oidcIssuerUrl: ""
   clientId: ""
   clientSecret: ""
   cookieName: ""
   cookieSecret: ""
-  emailDomains: "*"
-  port: ""
-  upstreams: []
+  emailDomains: ""
+  port: "4180"
+  upstreams:
+    - "http://qovery-{{ kubernetes_cluster_id }}.{{ managed_dns_domains_helm_format }}/"
 
 links: []
-#  - name: ""
-#    path: ""
-#    url: ""
-#    port: ""
+  - name: "Grafana"
+    path: "grafana"
+    url: "grafana.prometheus.svc.cluster.local"
+    port: "80"
+  - name: "Prometheus"
+    path: "prometheus"
+    url: "prometheus-operator-prometheus.prometheus.svc.cluster.local"
+    port: "9090"
 
 portal:
-  title: ""
-  port: ""
+  title: "qovery-{{ kubernetes_cluster_name }}"
+  port: "80"
 
 serviceAccount:
   # Specifies whether a service account should be created
