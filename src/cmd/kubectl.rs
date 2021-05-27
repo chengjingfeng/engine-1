@@ -1,6 +1,7 @@
 use std::io::Error;
 use std::path::Path;
 
+use chrono::Duration;
 use retry::delay::Fibonacci;
 use retry::OperationResult;
 use serde::de::DeserializeOwned;
@@ -9,12 +10,16 @@ use crate::cloud_provider::digitalocean::models::svc::DOKubernetesList;
 use crate::cloud_provider::metrics::KubernetesApiMetrics;
 use crate::cmd::structs::{
     Item, KubernetesEvent, KubernetesJob, KubernetesKind, KubernetesList, KubernetesNode, KubernetesPod,
-    KubernetesPodStatusPhase, KubernetesService, LabelsContent,
+    KubernetesPodStatusPhase, KubernetesService, KubernetesVersion, LabelsContent,
 };
 use crate::cmd::utilities::exec_with_envs_and_output;
 use crate::constants::KUBECONFIG;
 use crate::error::{SimpleError, SimpleErrorKind};
-use chrono::Duration;
+
+pub enum ScalingKind {
+    Deployment,
+    Statefulset,
+}
 
 pub fn kubectl_exec_with_output<F, X>(
     args: Vec<&str>,
@@ -685,6 +690,13 @@ where
     Ok(output_vec.join("\n"))
 }
 
+pub fn kubectl_exec_version<P>(kubernetes_config: P, envs: Vec<(&str, &str)>) -> Result<KubernetesVersion, SimpleError>
+where
+    P: AsRef<Path>,
+{
+    kubectl_exec::<P, KubernetesVersion>(vec!["version", "-o", "json"], kubernetes_config, envs)
+}
+
 pub fn kubectl_exec_get_node<P>(
     kubernetes_config: P,
     envs: Vec<(&str, &str)>,
@@ -803,6 +815,58 @@ where
         namespace, pods, metric_name
     );
     kubectl_exec::<P, KubernetesApiMetrics>(vec!["get", "--raw", api_url.as_str()], kubernetes_config, envs)
+}
+
+/// Get custom metrics values
+///
+/// # Arguments
+///
+/// * `kubernetes_config` - kubernetes config path
+/// * `envs` - environment variables required for kubernetes connection
+/// * `namespace` - kubernetes namespace
+/// * `kind` - kind of kubernetes resource to scale
+/// * `names` - name of the kind of resource to scale
+/// * `replicas_count` - desired number of replicas
+pub fn kubectl_exec_scale_replicas<P>(
+    kubernetes_config: P,
+    envs: Vec<(&str, &str)>,
+    namespace: &str,
+    kind: ScalingKind,
+    name: &str,
+    replicas_count: u32,
+) -> Result<(), SimpleError>
+where
+    P: AsRef<Path>,
+{
+    let kind_formated = match kind {
+        ScalingKind::Deployment => "deployment.v1.apps",
+        ScalingKind::Statefulset => "statefulset.v1.apps",
+    };
+    let kind_with_name = format!("{}/{}", kind_formated, name);
+
+    let mut _envs = Vec::with_capacity(envs.len() + 1);
+    _envs.push((KUBECONFIG, kubernetes_config.as_ref().to_str().unwrap()));
+    _envs.extend(envs);
+
+    kubectl_exec_with_output(
+        vec![
+            "-n",
+            namespace,
+            "scale",
+            &kind_with_name,
+            "--replicas",
+            &replicas_count.to_string(),
+        ],
+        _envs,
+        |out| match out {
+            Err(err) => error!("{:?}", err),
+            _ => {}
+        },
+        |out| match out {
+            Err(err) => error!("{:?}", err),
+            _ => {}
+        },
+    )
 }
 
 fn kubectl_exec<P, T>(args: Vec<&str>, kubernetes_config: P, envs: Vec<(&str, &str)>) -> Result<T, SimpleError>

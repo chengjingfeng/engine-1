@@ -45,6 +45,11 @@ resource "helm_release" "cluster_autoscaler" {
   max_history = 50
 
   set {
+    name = "replicaCount"
+    value = "{% if enable_cluster_autoscaler %}1{% else %}0{% endif %}"
+  }
+
+  set {
     name = "cloudProvider"
     value = "aws"
   }
