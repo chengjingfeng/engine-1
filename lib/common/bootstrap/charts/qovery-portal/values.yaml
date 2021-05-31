@@ -21,7 +21,7 @@ oauthConfig:
   upstreams:
     - "http://qovery-{{ kubernetes_cluster_id }}.{{ managed_dns_domains_helm_format }}/"
 
-links: []
+links:
   - name: "Grafana"
     path: "grafana"
     url: "grafana.prometheus.svc.cluster.local"

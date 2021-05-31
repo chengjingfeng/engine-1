@@ -14,6 +14,7 @@ data:
     cookie_name= {{ .Values.oauthConfig.cookieName | quote }}
     cookie_secret = {{ .Values.oauthConfig.cookieSecret | quote }}
     email_domains = {{ .Values.oauthConfig.emailDomains | quote }}
+    upstreams = [{{- range .Values.oauthConfig.upstreams }} {{ . | quote }} {{ end }}]
 
   default.conf: |-
     server {
@@ -45,7 +46,7 @@ data:
       <div>
         <ul>
           {{- range .Values.links }}
-          <li><a href="http://{{- $.Values.hostName -}}/{{- .path -}}"> {{ .name }} </a></li>
+          <li><a href="http://{{- $.Values.hostName -}}/{{- .path -}}/"> {{ .name }} </a></li>
           {{- end }}
         </ul>
       </div>
