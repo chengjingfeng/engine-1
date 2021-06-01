@@ -288,6 +288,14 @@ variable "metrics_history_enabled" {
   type = bool
 }
 
+# Qovery Portal
+
+variable "portal_hostname" {
+  description = "Hostname registered in DNS provider to access qovery-portal"
+  default = "enzo.oom.sh"
+  type = string
+}
+
 # Force helm upgrade
 variable "forced_upgrade" {
   description = "Force upgrade"
@@ -303,3 +311,4 @@ variable "resource_expiration_in_seconds" {
   type = number
 }
 {% endif %}
+

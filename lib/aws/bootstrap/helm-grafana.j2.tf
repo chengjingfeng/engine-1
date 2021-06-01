@@ -111,6 +111,16 @@ resource "helm_release" "grafana" {
     value = var.forced_upgrade
   }
 
+  set {
+    name = "grafana.ini.server.domain"
+    value = "${var.portal_hostname}"
+  }
+
+  set {
+    name = "grafana.ini.server.root_url"
+    value = "%(protocol)s://%(domain)s:%(http_port)s/grafana/"
+  }
+
   depends_on = [
     aws_eks_cluster.eks_cluster,
     helm_release.cluster_autoscaler,

@@ -117,6 +117,11 @@ resource "helm_release" "prometheus_operator" {
     value = "1Gi"
   }
 
+  set {
+    name = "alertmanager.alertmanagerSpec.alertmanagerSpec"
+    value = "http://${var.portal_hostname}/prometheus"
+  }
+
 {% if test_cluster %}
   set {
     name = "defaultRules.config"

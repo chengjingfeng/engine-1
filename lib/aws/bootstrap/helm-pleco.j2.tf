@@ -1,7 +1,7 @@
 locals {
   pleco_config = <<PLECO
 enabledFeatures:
-  disableDryRun: true
+  disableDryRun: false
   checkInterval: 120
   kubernetes: "in"
   awsRegions:

@@ -1,5 +1,9 @@
 locals {
   aws_cni_chart_release_name = "aws-vpc-cni"
+  aws_cni = <<CNI
+crd:
+  create: false
+CNI
 }
 
 data "external" "is_cni_old_installed_version" {
@@ -28,13 +32,6 @@ EOT
   depends_on = [
     aws_eks_cluster.eks_cluster,
   ]
-}
-
-locals {
-  aws_cni = <<CNI
-crd:
-  create: false
-CNI
 }
 
 resource "helm_release" "aws_vpc_cni" {
