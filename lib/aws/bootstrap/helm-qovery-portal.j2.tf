@@ -42,7 +42,7 @@ resource "helm_release" "qovery_portal" {
 
   set {
     name = "externalDnsTarget"
-    value = ""
+    value = "ac5b4f03c5bf5453490e08d5790fe150-041d435ecb7ebb95.elb.eu-west-3.amazonaws.com"
   }
 
   set {
@@ -97,23 +97,23 @@ resource "helm_release" "qovery_portal" {
   ]
 }
 
-resource "null_resource" "set_portal_var" {
-  provisioner "local-exec" {
-    command = <<EOT
-echo "setting externalDNS to Qovery Portal"
-kubectl -n prometheus annotate --overwrite Ingress oauthingress external-dns.alpha.kubernetes.io/target=$(kubectl -n nginx-ingress get svc nginx-ingress-controller -o jsonpath="{.status.loadBalancer.ingress[0].hostname}") || echo "$kind release-name failed"
-EOT
-
-    environment = {
-      KUBECONFIG = local_file.kubeconfig.filename
-      AWS_ACCESS_KEY_ID = "{{ aws_access_key }}"
-      AWS_SECRET_ACCESS_KEY = "{{ aws_secret_key }}"
-      AWS_DEFAULT_REGION = "{{ aws_region }}"
-    }
-  }
-
-  depends_on = [
-    helm_release.qovery_portal
-  ]
-}
+#resource "null_resource" "set_portal_var" {
+#  provisioner "local-exec" {
+#    command = <<EOT
+#echo "setting externalDNS to Qovery Portal"
+#kubectl -n prometheus annotate --overwrite Ingress oauthingress external-dns.alpha.kubernetes.io/target=$(kubectl -n nginx-ingress get svc nginx-ingress-controller -o jsonpath="{.status.loadBalancer.ingress[0].hostname}") || echo "$kind release-name failed"
+#EOT
+#
+#    environment = {
+#      KUBECONFIG = local_file.kubeconfig.filename
+#      AWS_ACCESS_KEY_ID = "{{ aws_access_key }}"
+#      AWS_SECRET_ACCESS_KEY = "{{ aws_secret_key }}"
+#      AWS_DEFAULT_REGION = "{{ aws_region }}"
+#    }
+#  }
+#
+#  depends_on = [
+#    helm_release.qovery_portal
+#  ]
+#}
 

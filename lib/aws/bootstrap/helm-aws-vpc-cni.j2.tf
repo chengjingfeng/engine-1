@@ -34,13 +34,6 @@ EOT
   ]
 }
 
-locals {
-  aws_cni = <<CNI
-crd:
-  create: false
-CNI
-}
-
 resource "helm_release" "aws_vpc_cni" {
   name = local.aws_cni_chart_release_name
   chart = "charts/aws-vpc-cni"
